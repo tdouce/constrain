@@ -1,6 +1,6 @@
 require 'rspec'
 require 'byebug'
-require_relative '../constrained'
+require_relative '../lib/constrained'
 
 describe Constrained do
   class User
