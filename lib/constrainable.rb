@@ -1,4 +1,7 @@
 module Constrainable
+  class PostHookFailure < StandardError; end
+  class PreHookFailure < StandardError; end
+
   def constrain(pre: [], post: [])
     if pre
       pre.each do |pr|
@@ -8,7 +11,7 @@ module Constrainable
           if msg
             raise msg
           else
-            raise "'pre' hook failed"
+            raise PreHookFailure.new("'pre' hook failed at #{ pr }")
           end
         end
       end
@@ -23,7 +26,7 @@ module Constrainable
             if msg
               raise "'#{ val }' " + msg
             else
-              raise "'post' hook failed"
+              raise PostHookFailure.new("'post' hook failed for value '#{ val }' at #{ po }")
             end
          end
       end

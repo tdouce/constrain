@@ -38,7 +38,7 @@ describe Constrainable do
       context "when 'pre' hook fails" do
         context "when amount is less than zero" do
           it 'raises an error' do
-            expect { subject }.to raise_error(RuntimeError)
+            expect { subject }.to raise_error(Constrainable::PreHookFailure)
           end
         end
       end
@@ -57,7 +57,7 @@ describe Constrainable do
       context "when 'pre' hook fails" do
         context "when amount is less than zero" do
           it 'raises an error' do
-            expect { subject }.to raise_error(RuntimeError)
+            expect { subject }.to raise_error(Constrainable::PostHookFailure)
           end
         end
       end
