@@ -19,24 +19,20 @@ module Constrainable
   class PreHookFailure < StandardError; end
 
   def constrain(pre: [], post: [], enable_local: false)
-    if enable_local || Configure.config.enabled
-      if pre
-        pre.each do |pr|
-          if !pr.call
-            raise PreHookFailure.new("'pre' hook failed at #{ pr }")
-          end
+    if pre && (enable_local || Configure.config.enabled)
+      pre.each do |pr|
+        unless pr.call
+          raise PreHookFailure.new("'pre' hook failed at #{ pr }")
         end
       end
     end
 
     val = yield
 
-    if enable_local || Configure.config.enabled
-      if post
-        post.each do |po|
-          if !po.call(val)
-            raise PostHookFailure.new("'post' hook failed for value '#{ val }' at #{ po }")
-          end
+    if post && (enable_local || Configure.config.enabled)
+      post.each do |po|
+        unless po.call(val)
+          raise PostHookFailure.new("'post' hook failed for value '#{ val }' at #{ po }")
         end
       end
     end
