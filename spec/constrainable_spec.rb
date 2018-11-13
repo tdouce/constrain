@@ -10,22 +10,68 @@ describe Constrainable do
   end
 
   describe '#deposit' do
-    context 'no constraints' do
-      let(:amount) { 10 }
-
-      def deposit(amount)
-        balance = 10
-        constrain do
-          balance + amount
+    context 'when globally enabled' do
+      before do
+        Constrainable::Configure.config do |config|
+          config.enabled = true
         end
       end
 
-      it 'returns new balance' do
-        expect(subject).to eq(20)
+      context 'no constraints' do
+        let(:amount) { 10 }
+
+        def deposit(amount)
+          balance = 10
+          constrain do
+            balance + amount
+          end
+        end
+
+        it 'returns new balance' do
+          expect(subject).to eq(20)
+        end
+      end
+
+      context "'pre' hook" do
+        let(:amount) { -10 }
+
+        def deposit(amount)
+          balance = 10
+          constrain(pre: [-> { amount > 0 }]) do
+            balance + amount
+          end
+        end
+
+        context "when 'pre' hook fails" do
+          context "when amount is less than zero" do
+            it 'raises an error' do
+              expect { subject }.to raise_error(Constrainable::PreHookFailure)
+            end
+          end
+        end
+      end
+
+      context "'post' hook" do
+        let(:amount) { -10 }
+
+        def deposit(amount)
+          balance = 10
+          constrain(post: [-> (return_val) { return_val > balance }]) do
+            balance + amount
+          end
+        end
+
+        context "when 'pre' hook fails" do
+          context "when amount is less than zero" do
+            it 'raises an error' do
+              expect { subject }.to raise_error(Constrainable::PostHookFailure)
+            end
+          end
+        end
       end
     end
 
-    context "'pre' hook" do
+    context 'when globally disabled' do
       let(:amount) { -10 }
 
       def deposit(amount)
@@ -35,31 +81,20 @@ describe Constrainable do
         end
       end
 
-      context "when 'pre' hook fails" do
-        context "when amount is less than zero" do
-          it 'raises an error' do
-            expect { subject }.to raise_error(Constrainable::PreHookFailure)
-          end
-        end
-      end
-    end
-
-    context "'post' hook" do
-      let(:amount) { -10 }
-
-      def deposit(amount)
-        balance = 10
-        constrain(post: [-> (return_val) { return_val > balance }]) do
-          balance + amount
+      before do
+        Constrainable::Configure.config do |config|
+          config.enabled = false
         end
       end
 
-      context "when 'pre' hook fails" do
-        context "when amount is less than zero" do
-          it 'raises an error' do
-            expect { subject }.to raise_error(Constrainable::PostHookFailure)
-          end
+      after do
+        Constrainable::Configure.config do |config|
+          config.enabled = true
         end
+      end
+
+      it 'returns the new balance' do
+        expect(subject).to eq(0)
       end
     end
   end
