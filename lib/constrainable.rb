@@ -5,14 +5,8 @@ module Constrainable
   def constrain(pre: [], post: [])
     if pre
       pre.each do |pr|
-        pred, msg = pr.call
-
-        if !pred
-          if msg
-            raise msg
-          else
-            raise PreHookFailure.new("'pre' hook failed at #{ pr }")
-          end
+        if !pr.call
+          raise PreHookFailure.new("'pre' hook failed at #{ pr }")
         end
       end
     end
@@ -21,14 +15,9 @@ module Constrainable
 
     if post
       post.each do |po|
-        pred, msg = po.call(val)
-          if !pred
-            if msg
-              raise "'#{ val }' " + msg
-            else
-              raise PostHookFailure.new("'post' hook failed for value '#{ val }' at #{ po }")
-            end
-         end
+        if !po.call(val)
+          raise PostHookFailure.new("'post' hook failed for value '#{ val }' at #{ po }")
+        end
       end
     end
 
