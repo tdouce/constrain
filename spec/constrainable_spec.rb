@@ -11,7 +11,6 @@ describe Constrainable do
   end
 
   let(:balance) { 10 }
-
   subject do
     deposit(amount)
   end
@@ -39,11 +38,9 @@ describe Constrainable do
           { pre: [-> { amount > 0 }] }
         end
 
-        context "when 'pre' hook fails" do
-          context "when amount is less than zero" do
-            it 'raises an error' do
-              expect { subject }.to raise_error(Constrainable::PreHookFailure)
-            end
+        context 'when hook fails' do
+          it 'raises an error' do
+            expect { subject }.to raise_error(Constrainable::PreHookFailure)
           end
         end
       end
@@ -54,17 +51,15 @@ describe Constrainable do
           { post: [-> (return_val) { return_val > balance }] }
         end
 
-        context "when 'post' hook fails" do
-          context "when amount is less than zero" do
-            it 'raises an error' do
-              expect { subject }.to raise_error(Constrainable::PostHookFailure)
-            end
+        context 'when hook fails' do
+          it 'raises an error' do
+            expect { subject }.to raise_error(Constrainable::PostHookFailure)
           end
         end
       end
     end
 
-    context 'when globally disabled' do
+    context 'when constraints are globally disabled' do
       let(:amount) { -10 }
       let(:constraint_options) do
         { pre: [-> { amount > 0 }] }
@@ -88,7 +83,7 @@ describe Constrainable do
 
       context 'with local enable override' do
         context "'pre' hook" do
-          context "when 'pre' hook fails" do
+          context 'when hook fails' do
             let(:constraint_options) do
               {
                 enable_local: true,
@@ -96,10 +91,8 @@ describe Constrainable do
               }
             end
 
-            context "when amount is less than zero" do
-              it 'raises an error' do
-                expect { subject }.to raise_error(Constrainable::PreHookFailure)
-              end
+            it 'raises an error' do
+              expect { subject }.to raise_error(Constrainable::PreHookFailure)
             end
           end
         end
@@ -113,11 +106,9 @@ describe Constrainable do
             }
           end
 
-          context "when 'post' hook fails" do
-            context "when amount is less than zero" do
-              it 'raises an error' do
-                expect { subject }.to raise_error(Constrainable::PostHookFailure)
-              end
+          context 'when hook fails' do
+            it 'raises an error' do
+              expect { subject }.to raise_error(Constrainable::PostHookFailure)
             end
           end
         end
