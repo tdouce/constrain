@@ -18,8 +18,8 @@ module Constrainable
   class PostHookFailure < StandardError; end
   class PreHookFailure < StandardError; end
 
-  def constrain(pre: [], post: [])
-    if Configure.config.enabled
+  def constrain(pre: [], post: [], enable_local: false)
+    if enable_local || Configure.config.enabled
       if pre
         pre.each do |pr|
           if !pr.call
@@ -31,7 +31,7 @@ module Constrainable
 
     val = yield
 
-    if Configure.config.enabled
+    if enable_local || Configure.config.enabled
       if post
         post.each do |po|
           if !po.call(val)
